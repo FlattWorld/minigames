@@ -16,9 +16,7 @@ export default function Home() {
     gameReducer,
     initialWordleAppState,
   );
-  const [targetTime, setTargetTime] = useState<any>(
-    new Date(new Date().getTime() + 5 * 60000),
-  );
+  const [targetTime, setTargetTime] = useState<any>(getDate());
   const [usedWords, setUsedWords] = useState<string[]>([]);
   const [currentWord, setCurrentWord] = useState("");
   const [didPlayerWon, setDidPlayerWon] = useState(false);
@@ -28,6 +26,14 @@ export default function Home() {
   const [timeRemaining, setTimeRemaining] = useState(
     calculateTimeRemaining(targetTime),
   );
+
+  function getDate() {
+    if (typeof window === "undefined" || !localStorage) {
+      return null;
+    } else {
+      return new Date(JSON.parse(localStorage.getItem("targetTime") as string));
+    }
+  }
 
   const keyManager = useCallback(
     (e: KeyboardEvent) => {
@@ -62,12 +68,9 @@ export default function Home() {
 
   useEffect(() => {
     if (!localStorage.getItem("visited")) {
-      localStorage.setItem("visited", "true");
       setIsInfo(true);
       setIsModalVisible(true);
     }
-    if (!currentWord) startGame();
-
     window.document.onkeyup = keyManager;
 
     return () => {
@@ -77,7 +80,14 @@ export default function Home() {
 
   useEffect(() => {
     if (timeRemaining.minutes === 0 && timeRemaining.seconds === 0) {
-      setTargetTime(new Date(new Date().getTime() + 5 * 60000));
+      let newTargetTime = new Date(
+        JSON.parse(localStorage.getItem("targetTime") as string),
+      );
+      const { minutes, seconds } = calculateTimeRemaining(newTargetTime);
+      if (minutes === 0 && seconds === 0)
+        newTargetTime = new Date(new Date().getTime() + 5 * 60000);
+      localStorage.setItem("targetTime", JSON.stringify(newTargetTime));
+      setTargetTime(newTargetTime);
       dispatch({ type: ACTION_TYPES.RESET });
       setIsModalVisible(false);
       setDidPlayerLose(false);
@@ -140,6 +150,7 @@ export default function Home() {
           info={isInfo}
           timeRemaining={timeRemaining}
           onClose={() => {
+            localStorage.setItem("visited", "true");
             setIsModalVisible(false);
             setIsInfo(false);
           }}
