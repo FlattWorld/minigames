@@ -53,10 +53,17 @@ export function gameReducer(state: AppState, action: any): AppState {
     case ACTION_TYPES.ADD: {
       if (state.solution[state.index].length > 4) return { ...state };
       else {
-        return {
+        const interState = {
           ...state,
           solution: addChar(state, action.char.toUpperCase()),
         };
+        if (interState.solution[state.index].length === 5) {
+          return {
+            ...state,
+            solution: evaluate(interState, action.comparison),
+            index: state.index + 1,
+          };
+        } else return interState;
       }
     }
     case ACTION_TYPES.NEXT: {

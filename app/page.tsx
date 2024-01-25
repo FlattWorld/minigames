@@ -16,7 +16,9 @@ export default function Home() {
     gameReducer,
     initialWordleAppState,
   );
-  const [targetTime, setTargetTime] = useState<any>(null);
+  const [targetTime, setTargetTime] = useState<any>(
+    new Date(new Date().getTime() + 5 * 60000),
+  );
   const [usedWords, setUsedWords] = useState<string[]>([]);
   const [currentWord, setCurrentWord] = useState("");
   const [didPlayerWon, setDidPlayerWon] = useState(false);
@@ -31,7 +33,11 @@ export default function Home() {
     (e: KeyboardEvent) => {
       if (didPlayerWon) return;
       if (e.key.match(/^[a-zA-ZñÑ]$/g) !== null)
-        dispatch({ type: ACTION_TYPES.ADD, char: e.key });
+        dispatch({
+          type: ACTION_TYPES.ADD,
+          char: e.key,
+          comparison: currentWord,
+        });
       else if (e.key === "Enter")
         dispatch({ type: ACTION_TYPES.EVAL, comparison: currentWord });
       else if (e.key === "Backspace") dispatch({ type: ACTION_TYPES.REMOVE });
@@ -39,11 +45,15 @@ export default function Home() {
     [currentWord, didPlayerWon],
   );
 
-  const startGame = () => {
+  const startGame = (): any => {
     const usedWordsLocal = JSON.parse(
       localStorage?.getItem("usedWords") || "[]",
     );
-    const idx = Math.floor(Math.random() * words.length);
+    let idx;
+    do {
+      idx = Math.floor(Math.random() * words.length);
+    } while (usedWordsLocal.includes(words[idx]));
+
     const usedWordList = [...usedWordsLocal, words[idx]];
     setUsedWords(usedWordList);
     setCurrentWord(words[idx]);
@@ -52,28 +62,26 @@ export default function Home() {
 
   useEffect(() => {
     if (!localStorage.getItem("visited")) {
+      localStorage.setItem("visited", "true");
       setIsInfo(true);
       setIsModalVisible(true);
     }
-    if (!currentWord && !didPlayerLose && !didPlayerWon) startGame();
+    if (!currentWord) startGame();
+
     window.document.onkeyup = keyManager;
 
     return () => {
       window.document.onkeyup = null;
     };
-  }, [keyManager]);
+  }, [keyManager, currentWord]);
 
   useEffect(() => {
-    if (
-      timeRemaining.minutes === 0 &&
-      timeRemaining.seconds === 0 &&
-      (didPlayerLose || didPlayerWon)
-    ) {
+    if (timeRemaining.minutes === 0 && timeRemaining.seconds === 0) {
+      setTargetTime(new Date(new Date().getTime() + 5 * 60000));
       dispatch({ type: ACTION_TYPES.RESET });
       setIsModalVisible(false);
       setDidPlayerLose(false);
       setDidPlayerWon(false);
-      setTargetTime(null);
       startGame();
     }
   }, [timeRemaining]);
@@ -86,11 +94,9 @@ export default function Home() {
       if (didPlayerWon) {
         const pastVictories = Number(localStorage.getItem("victories") || 0);
         localStorage.setItem("victories", JSON.stringify(pastVictories + 1));
-        setTargetTime(new Date(new Date().getTime() + 5 * 60000));
         setDidPlayerWon(true);
         setIsModalVisible(true);
       } else if (gameState.index > 4) {
-        setTargetTime(new Date(new Date().getTime() + 5 * 60000));
         setDidPlayerLose(true);
         setIsModalVisible(true);
       }
@@ -134,7 +140,6 @@ export default function Home() {
           info={isInfo}
           timeRemaining={timeRemaining}
           onClose={() => {
-            localStorage.setItem("visited", "true");
             setIsModalVisible(false);
             setIsInfo(false);
           }}
