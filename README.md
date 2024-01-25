@@ -23,6 +23,7 @@ La app consiste en el juego, la funcion de recordar cantidad de partidas jugadas
 ## Roadmap <!-- Features del proyecto (Actuales y planeadas) -->
 
 - [x] Build first website stage.
+- [ ] Make It Responsive
 
 <p align="right">(<a href="#top">Back to top</a>)</p>
 
