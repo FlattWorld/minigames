@@ -2,13 +2,10 @@
 import { useReducer, useEffect, useState, useCallback } from "react";
 import { gameReducer } from "@/utils/wordleReducer";
 import { initialWordleAppState, CHAR_STATES, ACTION_TYPES } from "@/utils/constants";
-import VirtualKeyboard from '@/components/VirtualKeyboard'
-import words from '@/utils/words.json'
-import Modal from "@/components/Modal";
-import GameTiles from "@/components/GameTiles";
+import {VirtualKeyboard, Modal, GameTiles, TopBar} from '@/components'
 import { AppState, SolutionChar } from "@/utils/types";
-import TopBar from "@/components/TopBar";
 import { calculateTimeRemaining } from "@/utils/helper";
+import words from '@/utils/words.json'
 
 export default function Home() {
   const [gameState, dispatch] = useReducer<React.Reducer<AppState, any>>(gameReducer, initialWordleAppState)
