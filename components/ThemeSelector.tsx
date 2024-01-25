@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { CloudIcon, StarIcon } from "@heroicons/react/16/solid";
 
 const ThemeSelector = () => {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("");
 
   useEffect(() => {
-    localStorage.setItem("theme", theme);
+    if (theme) localStorage.setItem("theme", theme);
     const htmlElement = document.getElementsByTagName("html")[0];
     if (theme === "dark") htmlElement?.classList.add("dark");
     if (theme === "light") htmlElement?.classList.remove("dark");
   }, [theme]);
+
+  useEffect(() => {
+    const localTheme = localStorage.getItem("theme");
+    if (localTheme && localTheme !== theme) setTheme(localTheme);
+    else setTheme("light");
+  }, []);
 
   return (
     <div className="flex items-center shadow rounded-full">
