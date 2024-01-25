@@ -1,3 +1,5 @@
+import { SolutionChar, AppState } from "./types";
+
 export const CHAR_STATES: { [key: string]: SolutionChar["state"] } = {
   PERFECT: "perfect",
   MISPLACED: "misplaced",
