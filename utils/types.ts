@@ -1,10 +1,10 @@
 
-type SolutionChar = {
+export type SolutionChar = {
   value: string;
   state: 'perfect' | 'misplaced' | 'wrong' | 'ready';
 }
 
-type AppState = {
+export type AppState = {
   index: number;
   solution: SolutionChar[][]
 }

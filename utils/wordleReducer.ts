@@ -1,4 +1,4 @@
-import { CHAR_STATES, ACTION_TYPES } from "./constants"
+import { CHAR_STATES, ACTION_TYPES, initialWordleAppState } from "./constants"
 
 const addChar = (state:AppState, char:string) => {
   const {index, solution} = state
@@ -27,37 +27,34 @@ const removeChar = (state: AppState) => {
 }
 
 const evaluate = (state: AppState, comparison: string) => {
-  const solutionRow = state.solution[state.index]
 
+  const normalizedComp = comparison.toUpperCase()
+
+  const solutionRow = state.solution[state.index]
   const evaluatedSolution = solutionRow.map((char, index) => {
-    console.log(char, index)
-    if(char.value === comparison[index]) {
+    if(char.value === normalizedComp[index]) {
       return {...char, state: CHAR_STATES.PERFECT }
-    }else if(comparison.includes(char.value)) {
+    }else if(normalizedComp.includes(char.value)) {
       return {...char, state: CHAR_STATES.MISPLACED }
     }else {
       return {...char, state: CHAR_STATES.WRONG }
     }
   })
-  console.log({evaluatedSolution})
   return state.solution.map((sol,idx) => idx === state.index ? evaluatedSolution : sol)
 
 }
 
 export function gameReducer(state: AppState, action:any):AppState {
-   console.log(state, action)
-  if(state.index > 4) {
-    console.error('NOS PASAMOS :V')
+  if(state.index > 4 && action.type !== ACTION_TYPES.RESET) {
     return({...state})
   }
-
   switch(action.type){
     case ACTION_TYPES.ADD: {
       if(state.solution[state.index].length > 4) return {...state}
       else {
         return ({
           ...state,
-          solution: addChar(state, action.char)
+          solution: addChar(state, action.char.toUpperCase())
         })
       }
     }
@@ -74,7 +71,7 @@ export function gameReducer(state: AppState, action:any):AppState {
       }
     }
     case ACTION_TYPES.EVAL: {
-      if(state.solution[state.index].length < 4) return {...state}
+      if(state.solution[state.index].length < 5) return {...state}
       else {
         return ({
           ...state,
@@ -82,6 +79,9 @@ export function gameReducer(state: AppState, action:any):AppState {
           index: state.index +1,
         })
       }
+    }
+    case ACTION_TYPES.RESET: {
+      return initialWordleAppState
     }
   }
   console.error('Unknown Action type')
