@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description: "Dacodes Challenge",
 };
 
+//TODO- ADD SELECT GAME PAGE
+//TODO- ADD EXTRA GAMES
+
 export default function RootLayout({
   children,
 }: Readonly<{
