@@ -1,4 +1,5 @@
 import { CHAR_STATES, ACTION_TYPES, initialWordleAppState } from "./constants";
+import { AppState } from "./types";
 
 const addChar = (state: AppState, char: string) => {
   const { index, solution } = state;
